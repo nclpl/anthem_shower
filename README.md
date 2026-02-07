@@ -11,10 +11,24 @@ A custom [Home Assistant](https://www.home-assistant.io/) integration for Kohler
 
 ## Installation
 
+### HACS (recommended)
+
+1. Install [HACS](https://hacs.xyz/) if you haven't already.
+2. In Home Assistant, go to **HACS > Integrations**.
+3. Open the three-dot menu in the top right and select **Custom repositories**.
+4. Enter `https://github.com/nclpl/anthem_shower` and select **Integration** as the category.
+5. Click **Add**, then find **Anthem Shower** in the list and click **Download**.
+6. Restart Home Assistant.
+
+### Manual
+
 1. Copy the `anthem_shower` folder into your Home Assistant `custom_components` directory.
 2. Restart Home Assistant.
-3. Go to **Settings > Devices & Services > Add Integration** and search for **Anthem Shower**.
-4. Enter the IP address of your Anthem hub and your PIN.
+
+### Configuration
+
+1. Go to **Settings > Devices & Services > Add Integration** and search for **Anthem Shower**.
+2. Enter the IP address of your Anthem hub and your PIN.
 
 ## Requirements
 
