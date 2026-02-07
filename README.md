@@ -2,6 +2,8 @@
 
 A custom [Home Assistant](https://www.home-assistant.io/) integration for Kohler Anthem+ Digital Shower systems. It communicates with the Anthem hub over your local network to expose shower status as a binary sensor. At this time, I haven't implemented any further sensors or control. But I hope to be able to do this as time allows.
 
+This has only been tested on Anthem+ firmware **2.72**
+
 ## Features
 
 - Binary sensor indicating whether the shower is currently running
