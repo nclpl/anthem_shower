@@ -1,4 +1,4 @@
-# Anthem Shower
+# Kohler Anthem+ Digital Shower Home Assistant Custom Component
 
 A custom [Home Assistant](https://www.home-assistant.io/) integration for Kohler Anthem+ Digital Shower systems. It communicates with the Anthem hub over your local network to expose shower status as a binary sensor. At this time, I haven't implemented any further sensors or control. But I hope to be able to do this as time allows.
 
