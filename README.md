@@ -37,4 +37,3 @@ This has only been tested on Anthem+ firmware **2.72**
 - An Anthem Shower hub reachable on your local network
 - The PIN configured on your hub. Note: if you change the PIN by using the "Generate PIN" function of the Anthem web interface, this integration will fail to authenticate and you'll need to enter the new PIN into the integration configuration
 - Home Assistant 2024.1 or later
-- Python package `cryptography >= 42.0.0` (installed automatically)
