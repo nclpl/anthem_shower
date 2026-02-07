@@ -1,0 +1,31 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Anthem Shower Hub",
+        "description": "Enter the IP address and PIN for your Anthem shower hub.",
+        "data": {
+          "host": "Host (IP address)",
+          "pin": "PIN",
+          "scan_interval": "Poll interval (seconds)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Anthem Shower Hub",
+        "description": "Authentication to the Anthem hub at **{host}** failed. Please enter the current PIN.",
+        "data": {
+          "pin": "PIN"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the Anthem hub. Check the IP address.",
+      "invalid_auth": "Authentication failed. Check the PIN.",
+      "unknown": "An unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This hub is already configured.",
+      "reauth_successful": "PIN updated successfully."
+    }
+  }
+}
