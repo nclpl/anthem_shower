@@ -3,10 +3,18 @@
     "step": {
       "user": {
         "title": "Connect to Anthem Shower Hub",
-        "description": "Enter the IP address and PIN for your Anthem shower hub.",
+        "description": "Enter the IP address for your Anthem shower hub. PIN is optional and only needed for future control features.",
         "data": {
           "host": "Host (IP address)",
-          "pin": "PIN",
+          "pin": "PIN (optional)",
+          "scan_interval": "Poll interval (seconds)"
+        }
+      },
+      "zeroconf_confirm": {
+        "title": "Discovered Anthem Shower Hub",
+        "description": "Found an Anthem Shower hub at **{host}**.\n\nPIN is optional and only needed for future control features.",
+        "data": {
+          "pin": "PIN (optional)",
           "scan_interval": "Poll interval (seconds)"
         }
       },

@@ -38,15 +38,21 @@ class AnthemCoordinator(DataUpdateCoordinator[dict]):
         try:
             return await self.client.get_running_state()
         except AnthemAuthError:
-            # Token expired mid-cycle; retry once with fresh token
-            try:
-                return await self.client.get_running_state()
-            except AnthemAuthError as err:
-                # Two consecutive auth failures → PIN is likely invalid
-                raise ConfigEntryAuthFailed(
-                    "Authentication failed. The PIN may have been changed on the hub."
-                ) from err
-            except AnthemConnectionError as err:
-                raise UpdateFailed(str(err)) from err
+            # Only handle auth errors if PIN is configured
+            # If PIN is not configured, this shouldn't happen
+            if self.client._pin:
+                # Token expired mid-cycle; retry once with fresh token
+                try:
+                    return await self.client.get_running_state()
+                except AnthemAuthError as err:
+                    # Two consecutive auth failures → PIN is likely invalid
+                    raise ConfigEntryAuthFailed(
+                        "Authentication failed. The PIN may have been changed on the hub."
+                    ) from err
+                except AnthemConnectionError as err:
+                    raise UpdateFailed(str(err)) from err
+            else:
+                # No PIN configured, shouldn't get auth errors
+                raise UpdateFailed("Unexpected authentication error without PIN configured")
         except AnthemConnectionError as err:
             raise UpdateFailed(str(err)) from err

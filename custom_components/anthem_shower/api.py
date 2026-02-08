@@ -32,14 +32,14 @@ class AnthemConnectionError(Exception):
 class AnthemApiClient:
     """Client for the Anthem shower local API."""
 
-    def __init__(self, host: str, pin: str, session: aiohttp.ClientSession) -> None:
+    def __init__(self, host: str, pin: str | None, session: aiohttp.ClientSession) -> None:
         """Initialise the client."""
         self._host = host
         self._pin = pin
         self._session = session
         self._token: str | None = None
         self._token_exp: float = 0
-        self._public_key = load_pem_public_key(ANTHEM_RSA_PUBLIC_KEY_PEM.encode())
+        self._public_key = load_pem_public_key(ANTHEM_RSA_PUBLIC_KEY_PEM.encode()) if pin else None
 
     @property
     def _base_url(self) -> str:
@@ -56,6 +56,8 @@ class AnthemApiClient:
 
     def _encrypt_pin(self) -> str:
         """SHA-256 hash the PIN then RSA-encrypt it, returning base64."""
+        if not self._pin or not self._public_key:
+            raise AnthemAuthError("PIN not configured")
         pin_hash = hashlib.sha256(self._pin.encode()).hexdigest()
         encrypted = self._public_key.encrypt(
             pin_hash.encode(),
@@ -115,6 +117,11 @@ class AnthemApiClient:
           running: bool
           device_names: list[str]
         """
+        # If no PIN is configured, use the unauthenticated endpoint
+        if self._pin is None:
+            return await self._get_running_state_unauthenticated()
+
+        # Otherwise use authenticated endpoint
         token = await self._ensure_token()
         url = f"{self._base_url}/get_hub_running_state"
 
@@ -137,6 +144,36 @@ class AnthemApiClient:
             raise AnthemAuthError("Token expired")
 
         if data.get("status") == "false":
+            raise AnthemConnectionError(f"Hub returned error: {data}")
+
+        return {
+            "running": data.get("running") is True,
+            "device_names": data.get("devicename", []),
+        }
+
+    async def _get_running_state_unauthenticated(self) -> dict:
+        """Poll the hub for running state without authentication.
+
+        Only requires the random_uuid header.
+
+        Returns dict with keys:
+          running: bool
+          device_names: list[str]
+        """
+        url = f"{self._base_url}/get_hub_running_state"
+
+        try:
+            async with self._session.get(
+                url, headers=self._common_headers(), timeout=aiohttp.ClientTimeout(total=10)
+            ) as resp:
+                data = await resp.json(content_type=None)
+        except (aiohttp.ClientError, TimeoutError) as err:
+            raise AnthemConnectionError(f"Status request failed: {err}") from err
+
+        if not isinstance(data, dict):
+            raise AnthemConnectionError(f"Unexpected response: {data}")
+
+        if data.get("error"):
             raise AnthemConnectionError(f"Hub returned error: {data}")
 
         return {
@@ -198,6 +235,6 @@ class AnthemApiClient:
         _LOGGER.debug("water_test_stop response: %s", data)
 
     async def async_test_connection(self) -> bool:
-        """Test that we can auth and poll. Used by config flow."""
+        """Test that we can connect and poll. Used by config flow."""
         await self.get_running_state()
         return True

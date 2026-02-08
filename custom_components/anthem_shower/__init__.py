@@ -25,7 +25,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: AnthemConfigEntry) -> bo
     session = async_get_clientsession(hass)
     client = AnthemApiClient(
         host=entry.data[CONF_HOST],
-        pin=entry.data[CONF_PIN],
+        pin=entry.data.get(CONF_PIN),
         session=session,
     )
     scan_interval = entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
