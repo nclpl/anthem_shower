@@ -144,6 +144,59 @@ class AnthemApiClient:
             "device_names": data.get("devicename", []),
         }
 
+    async def start_water_test(self, temperature: float) -> None:
+        """Send water_test_start command."""
+        token = await self._ensure_token()
+        url = f"{self._base_url}/req_update_command"
+        payload = {
+            "req_command": "water_test_start",
+            "zone1": {
+                "temperature": temperature,
+                "flowRate": 100,
+                "outletState": [1, 0, 0, 0, 0, 0],
+            },
+        }
+        try:
+            async with self._session.post(
+                url, json=payload, headers=self._common_headers(token),
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                if resp.status == 403:
+                    self.invalidate_token()
+                    raise AnthemAuthError("Token rejected (403)")
+                data = await resp.json(content_type=None)
+        except (aiohttp.ClientError, TimeoutError) as err:
+            raise AnthemConnectionError(f"Start command failed: {err}") from err
+
+        if isinstance(data, dict) and data.get("error") == "Unauthorised token":
+            self.invalidate_token()
+            raise AnthemAuthError("Token expired")
+
+        _LOGGER.debug("water_test_start response: %s", data)
+
+    async def stop_water_test(self) -> None:
+        """Send water_test_stop command."""
+        token = await self._ensure_token()
+        url = f"{self._base_url}/req_update_command"
+        payload = {"req_command": "water_test_stop"}
+        try:
+            async with self._session.post(
+                url, json=payload, headers=self._common_headers(token),
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                if resp.status == 403:
+                    self.invalidate_token()
+                    raise AnthemAuthError("Token rejected (403)")
+                data = await resp.json(content_type=None)
+        except (aiohttp.ClientError, TimeoutError) as err:
+            raise AnthemConnectionError(f"Stop command failed: {err}") from err
+
+        if isinstance(data, dict) and data.get("error") == "Unauthorised token":
+            self.invalidate_token()
+            raise AnthemAuthError("Token expired")
+
+        _LOGGER.debug("water_test_stop response: %s", data)
+
     async def async_test_connection(self) -> bool:
         """Test that we can auth and poll. Used by config flow."""
         await self.get_running_state()

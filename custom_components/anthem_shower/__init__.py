@@ -15,7 +15,7 @@ from .coordinator import AnthemCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR]
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.NUMBER, Platform.VALVE]
 
 type AnthemConfigEntry = ConfigEntry
 

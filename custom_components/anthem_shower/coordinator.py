@@ -31,6 +31,7 @@ class AnthemCoordinator(DataUpdateCoordinator[dict]):
             update_interval=timedelta(seconds=scan_interval),
         )
         self.client = client
+        self.target_temperature: float = 100.0
 
     async def _async_update_data(self) -> dict:
         """Fetch running state from the hub."""
